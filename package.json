@@ -1,0 +1,50 @@
+{
+  "name": "apiwatch",
+  "version": "1.0.0",
+  "description": "Zero-config Node.js performance & regression debugger that tells you WHY your API became slow.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepack": "npm run build && npm test",
+    "demo": "tsx demo/server.ts",
+    "simulate": "tsx demo/simulate_traffic.ts",
+    "test": "tsx --test test/*.test.ts"
+  },
+  "keywords": [
+    "apm",
+    "performance",
+    "profiler",
+    "sql",
+    "n+1",
+    "regression",
+    "express",
+    "observability",
+    "debugger",
+    "mysql",
+    "postgres"
+  ],
+  "author": "Karthik",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

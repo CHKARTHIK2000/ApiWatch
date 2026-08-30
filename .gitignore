@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Build output (tracked for npm package, ignored in git if building in CI, or included)
+# For git repo:
+dist/
+
+# ApiWatch local database & SQLite files
+.apiwatch.db*
+*.db
+*.db-wal
+*.db-shm
+.test_*.db*
+
+# Logs & OS artifacts
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
