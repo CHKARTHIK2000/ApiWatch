@@ -1,6 +1,6 @@
 {
   "name": "node-apiwatch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Zero-config Node.js performance & regression debugger that tells you WHY your API became slow.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
