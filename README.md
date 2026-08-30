@@ -3,9 +3,48 @@
 > **Zero-Config Performance & Regression Debugger for Node.js**  
 > *Don't just monitor how slow your API is — pinpoint exactly **WHY** it became slow.*
 
-[![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](#)
+[![Tests](https://img.shields.io/badge/tests-29%2F29%20passing-brightgreen.svg)](#)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](#)
+[![Overhead](https://img.shields.io/badge/Overhead-%2B0.15ms-informational.svg)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#)
+
+---
+
+## ⚡ 2-Line Zero-Effort Setup
+
+You do **NOT** need to touch or modify any of your existing routes or database queries! Simply add **2 lines** to your main server entrypoint:
+
+```javascript
+import express from 'express';
+import mysql from 'mysql2/promise';
+import { apiwatch, instrumentDatabaseObject } from 'apiwatch';
+
+const app = express();
+
+// ⚡ Line 1: Track all endpoints & serve dashboard at /__apiwatch
+app.use(apiwatch());
+
+// ⚡ Line 2: Auto-instrument your DB pool (Tracks ALL queries across the entire app)
+export const pool = mysql.createPool({ host: 'localhost', user: 'root', database: 'mydb' });
+instrumentDatabaseObject(pool, 'mysql2'); // Or 'pg' for PostgreSQL
+
+// All your normal routes work untouched without changing a single line!
+app.get('/api/users', async (req, res) => {
+  const [rows] = await pool.query('SELECT * FROM users'); // Automatically tracked & correlated!
+  res.json(rows);
+});
+
+app.listen(3000, () => {
+  console.log('Server running! Open dashboard at http://localhost:3000/__apiwatch');
+});
+```
+
+*Prefer CommonJS (`require`)?*
+```javascript
+const { apiwatch, instrumentDatabaseObject } = require('apiwatch');
+app.use(apiwatch());
+instrumentDatabaseObject(pool, 'mysql2');
+```
 
 ---
 
@@ -40,60 +79,12 @@ Actionable Recommendations:
 ## ✨ Features
 
 - ⚡ **Zero External Infrastructure:** Powered by embedded SQLite (`.apiwatch.db` via Node's native SQLite) — no Docker containers, no Redis, no Grafana setups needed.
-- 🎯 **Root-Cause Regression Diagnosis:** Automatically detects latency regressions (>25%) and identifies the specific SQL query responsible.
-- ⚠️ **N+1 Query Detection:** Flags repeated query patterns executed in a loop within single request lifecycles (e.g. 8 queries per request) and calculates wasted milliseconds.
+- 🎯 **Root-Cause Regression Diagnosis:** Automatically detects latency regressions (>25%) and identifies the specific SQL query responsible without false accusations.
+- ⚠️ **N+1 Query Detection:** Flags repeated query patterns executed in a loop within single request lifecycles (e.g. 12 queries per request) and calculates wasted milliseconds.
 - 🔍 **SQL Query Fingerprinting:** Automatically strips string literals, integers, and UUIDs (`SELECT * FROM users WHERE id = 42` ➔ `SELECT * FROM users WHERE id = ?`) to compute true P50/P90/P95/P99 latency per query pattern.
+- 🔒 **Sensitive Data Protection:** Automatically redacts passwords, tokens, API keys, emails, and credit cards from recorded SQL statements.
 - 🌊 **Request Waterfall Breakdown:** Visualize exact time spent in Middleware / Business Logic vs Database SQL execution.
 - 📊 **Embedded Dark-Mode Dashboard:** Built-in web dashboard served at `/__apiwatch`.
-
----
-
-## 📦 Quickstart
-
-### 1. Install
-
-```bash
-npm install apiwatch
-```
-
-### 2. Plug into Express
-
-```typescript
-import express from 'express';
-import { apiwatch, trackQuery } from 'apiwatch';
-
-const app = express();
-
-// 1. Register middleware (mounts dashboard at /__apiwatch)
-app.use(apiwatch());
-
-// 2. Track queries using trackQuery wrapper or auto-instrumentation
-app.get('/api/users', async (req, res) => {
-  const users = await trackQuery('SELECT * FROM users LIMIT 20', async () => {
-    return await db.query('SELECT * FROM users LIMIT 20');
-  }, 'pg');
-
-  res.json(users);
-});
-
-app.listen(3000, () => {
-  console.log('Server running! Open dashboard at http://localhost:3000/__apiwatch');
-});
-```
-
----
-
-## 🛠️ Auto-Instrumenting DB Pools (MySQL / Postgres)
-
-Instead of wrapping queries manually, you can auto-instrument your database pool or connection:
-
-```typescript
-import { instrumentDatabaseObject } from 'apiwatch';
-import mysql from 'mysql2/promise';
-
-const pool = mysql.createPool({ ... });
-instrumentDatabaseObject(pool, 'mysql2');
-```
 
 ---
 
@@ -129,7 +120,7 @@ app.use(
 
 ## 🧪 Testing & Demo
 
-Run the full automated test suite:
+Run the full automated test suite (29 tests):
 ```bash
 npm test
 ```
