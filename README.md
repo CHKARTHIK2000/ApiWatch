@@ -17,7 +17,7 @@ You do **NOT** need to touch or modify any of your existing routes or database q
 ```javascript
 import express from 'express';
 import mysql from 'mysql2/promise';
-import { apiwatch, instrumentDatabaseObject } from 'apiwatch';
+import { apiwatch, instrumentDatabaseObject } from 'node-apiwatch';
 
 const app = express();
 
@@ -41,7 +41,7 @@ app.listen(3000, () => {
 
 *Prefer CommonJS (`require`)?*
 ```javascript
-const { apiwatch, instrumentDatabaseObject } = require('apiwatch');
+const { apiwatch, instrumentDatabaseObject } = require('node-apiwatch');
 app.use(apiwatch());
 instrumentDatabaseObject(pool, 'mysql2');
 ```
